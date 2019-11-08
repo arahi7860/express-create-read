@@ -204,7 +204,9 @@ part of the request-response cycle.
 When we pass a function into `app.get` or `app.post`, that function is
 middleware.
 
-`body-parser` is an example of [third-party middleware](https://expressjs.com/en/guide/using-middleware.html#middleware.third-party). We can tell Express to use it with `app.use`:
+`body-parser` is an example of [third-party
+middleware](https://expressjs.com/en/guide/using-middleware.html#middleware.third-party).
+We can tell Express to use it with `app.use`:
 
 ```js
 app.use(parser.json())
@@ -217,6 +219,30 @@ We can test out `GET` requests through the browser, but we can't do that for
 tool: [Postman](https://www.getpostman.com/)
 
 ![](./assets/postman.png)
+
+Let's test out sending a `POST` request to our API!
+
+## Creating Nested Documents
+
+We can now create new lists with our API, but we can't create items in those
+lists yet. Some developers might implement this with a `PUT` or `PATCH` request,
+since we are technically _updating_ a List, but we can also do this with
+a `POST` - we are also _creating_ an item.
+
+This will combine the detail path (i.e. `list/:id`) with a `POST` request. We
+want to add the item to a specific list:
+
+```js
+app.post('/list/:id/item', (req, res) => {
+  List.findByIdAndUpdate(
+    req.params.id,
+    { $push: { items: req.body } },
+    { new: true }
+  ).then(list => {
+    res.json(list)
+  })
+})
+```
 
 ## [License](LICENSE)
 
