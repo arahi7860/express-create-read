@@ -1,104 +1,222 @@
 [![General Assembly Logo](https://camo.githubusercontent.com/1a91b05b8f4d44b5bbfb83abac2b0996d8e26c92/687474703a2f2f692e696d6775722e636f6d2f6b6538555354712e706e67)](https://generalassemb.ly/education/web-development-immersive)
 
-# Talk Template
+# Express: Create and Read
 
-Use this template to structure your READMEs for talks. Remove text from this
-section, or use it to frame the talk you are giving. Good framing answers the
-question "Why am I learning this?".
-
-Be sure to include a recent [`LICENSE`](LICENSE) and Markdown linter
-configuration ([`.remarkrc`](.remarkrc)). Also, include an appropriate
-`.gitignore`; these are usually found in specific technology templates, for
-example [js-template](https://www.github.com/ga-wdi-boston/js-template).
+This lesson will cover the two most important aspects of any API: reading and
+creating data.
 
 ## Prerequisites
 
-- Topics with which developers should be familiar with.
-- Prerequisites are "just-in-time", so if I have a prerequisite that mentions
-  Sass, I would **not** need to include CSS as a prerequisite.
-- [Links to previous materials](https://www.github.com/ga-wdi-boston/example)
-  are often useful.
+- Node
+- MongoDB and Mongoose
+- Express
 
 ## Objectives
 
 By the end of this, developers should be able to:
 
-- Write objectives that focus on demonstrating knowledge.
-- Write learning objectives that begin with an
-  [imperative verb](https://en.wikipedia.org/wiki/Imperative_mood).
-- Avoid objectives that start with "Use" or "Understand".
-- Rewrite objecives that begin with "Use" by inverting sentence structure.
-- End each objective with a period.
-- Write objectives on the whiteboard so they can be referenced during a talk.
+- Define list and detail routes in an Express API
+- Define a create route in an Express API
 
-## Preparation
+## Introduction
 
-1. Fork and clone this repository.
-   [FAQ](https://github.com/ga-wdi-boston/meta/wiki/ForkAndClone)
-1. Create a new branch, `training`, for your work.
-1. Checkout to the `training` branch.
-1. Install dependencies with `npm install`.
+We've discussed the four components of CRUD before:
 
-Better preparation instructions may be found as
-[snippets](https://github.com/ga-wdi-boston/instructors/tree/master/snippets).
+1. Create
+1. Read
+1. Update
+1. Delete
 
-It's a good idea to have students do these steps while you're writing objectives
-on the whiteboard.
+We're going to focus on Create and Read first. All of the APIs we've interacted
+with so far have had robust methods of reading data from them - that is, in
+fact, exclusively what we've used them for! With reading data, creating new data
+in an API is extremely important.
 
-## Leading Topic Heading
+## We Do: Express, Mongoose setup
 
-Here is where the talk begins. If you have not already included framing above,
-it's appropriate to put it here. Link to introductory articles or documentation.
-Motivate the next section.
+Before we get started, let's build out our base Express app. We already have
+a `package.json` in this repository.
 
-Demos, exercises, and labs are labelled as such, followed by a colon and a
-description of the activity starting with an
-[imperative verb](https://en.wikipedia.org/wiki/Imperative_mood).
+- How do we establish our database connection?
+- How do we setup a basic Express server?
+- Let's define a List model with a `name` property and `items` subdocument with
+    `title`, `status`, and `deadline` properties.
 
-## Demo: Write a Demo
+## Resourceful Routing
 
-Demos are demonstrations, and developers should give their full attention to
-them. It's a great time for them to take notes about important concepts before
-applying them in an exercise.
+We've seen this table of the [Golden
+Seven](https://restfulrouting.com/#golden-seven) named routes in REST:
 
-Demos correspond to the "I do" portion of scaffolding from consultant training.
+| URL | Path | Method  | Action | Description |
+| --- | --- | --- | --- | --- |
+| `/resource` | `/` | `GET` | #index | List all items of `resource` |
+| `/resource/new` | `/new` | `GET` | #new | Render form to create a new instance of `resource` |
+| `/resource` | `/` | `POST` | #create | Create new `resource` in the database |
+| `/resource/1` | `/:id` | `GET` | #show | Show a single `resource` |
+| `/resource/1/edit` | `/:id/edit` | `GET` | #edit | Render form to update a single `resource` |
+| `/resource/1` | `/:id` | `PATCH`/`PUT` | #update | Update `resource` in the database |
+| `/resource/1` | `/:id` | `DELETE` | #destroy | Delete a `resource` |
 
-## Code-Along: Write an Code-Along
+Based on the descriptions, which of these routes are related to reading data?
+Which are related to creating data?
 
-During the code-along, developers should apply concepts covered in the previous
-demo, led by the consultant. This is their first chance to generalize concepts
-introduced. Exercises should be very focused, and flow natural into a lab.
+<details>
+<summary>Solution</summary>
 
-Exercises correspond to the "We do" portion of scaffolding from consultant
-training.
+**Read:**
 
-## Lab: Write a Lab
+| URL | Path | Method  | Action | Description |
+| --- | --- | --- | --- | --- |
+| `/resource` | `/` | `GET` | #index | List all items of `resource` |
+| `/resource/1` | `/:id` | `GET` | #show | Show a single `resource` |
 
-During labs, developers get to demonstrate their understanding of concepts from
-demos and applied knowledge from exercises. Labs are an opportunity for
-developers to build confidence, and also serve as a diagnostic tool for
-consultants to evaluate developer understanding.
+**Create:**
 
-Labs should be timed explicitly using a timer. When estimating the time it will
-take to complete a lab, it is better to overestimate. During labs, consultants
-should circle the room and interact with developers, noting patterns and
-prompting with hints on how to complete the lab. If developers end early, a
-consultant may stop the lab timer. If developers do not finish in time, a
-consultant may give more time at her discretion based on current talk pace, the
-current estimate for the talk, and the importance of completing the lab while
-consultant support is available.
+| URL | Path | Method  | Action | Description |
+| --- | --- | --- | --- | --- |
+| `/resource` | `/` | `POST` | #create | Create new `resource` in the database |
 
-Labs correspond to the "You do" portion of scaffolding from consultant training.
+</details>
 
-## Additional Resources
+These routes map to the code we will write in our Express API, as you'll see.
 
-- Any useful links should be included in the talk material where the link is
-  first referenced.
-- Additional links for further study or exploration are appropriate in this
-  section.
-- Links to important parts of documentation not covered during the talk, or
-  tools tangentially used but not part of the focus of the talk, are also
-  appropriate.
+## Reading Data from an API
+
+There are a number of ways that we can set up an API so that our users can pull
+data from it. We're going to focus on REST and the most common ways: list and
+detail routes.
+
+A **list** route _lists_ all the objects of a certain resource. A **detail**
+route, provides the _details_ of a specific instance of a resource.
+
+Let's work through both.
+
+### List Routes
+
+As I said before, the purpose of the list route is to _list_ all the objects of
+a certain resource. Your feed on Facebook is one version of a list route.
+Typically, the path for the list route of a resources is just the resource name
+(i.e. `/tweets`).
+
+The route we define in Express will query our model for all instances of a given
+resource and return that list back to the user. Here are two examples:
+
+1. [PokeAPI Pokemon list route](https://pokeapi.co/api/v2/pokemon)
+1. [Star Wars People list route](https://swapi.co/api/people/)
+
+To build this out ourselves, we define a route with the path for our resource
+and query our model, returning the results to our user:
+
+```js
+// index.js
+const List = require('./models/List')
+
+app.get('/list', (req, res) => {
+  List.find({}).then(lists => {
+    res.json(lists)
+  })
+})
+```
+
+### Detail Routes
+
+The purpose of the detail route is to return a single object, based on an ID in
+the URL's path. Here are two examples:
+
+1. [PokeAPI Bulbasaur](https://pokeapi.co/api/v2/pokemon/1)
+1. [Star Wars API Luke Skywalker](https://swapi.co/api/people/1/)
+
+Notice the URL path?
+
+We can implement something like that ourselves:
+
+```js
+app.get('/list/:id', (req, res) => {
+  List.findById(req.params.id).then(list => {
+    res.json(list)
+  })
+})
+```
+
+Test it out in the browser!
+
+### Aside: Query and Search Routes
+
+The detail route works great for most cases. But there will be times when you
+want to look up a document by some property other than it's ID. How do we do
+that?
+
+We have a few options here:
+
+1. [Query Strings](https://expressjs.com/en/4x/api.html#req.query)
+1. Named Routes
+
+We'll leave query strings as a fun bonus for now and look at named routes.
+Here's an example:
+
+```js
+app.get('/list/name/:name', (req, res) => {
+    List.find({name: req.params.name}).then(lists => {
+      res.json(lists)
+  })
+})
+```
+
+This works well when we only want to query by a few properties. When we want to
+let the user query by any property of the document, we should look into query
+strings.
+
+## Creating Data in an API
+
+Now, let's turn to creating data in our API! This will be a little different
+from the routes we've defined so far. We're going to use Express' `post` method,
+instead of `get`. That's because a user is going to create some data by making
+a `POST` request to our route.
+
+```js
+app.post('/list', (req, res) => {
+  List.create(req.body).then(list => {
+    res.json(list)
+  })
+})
+```
+
+### Aside: Middleware and Body Parser
+
+That's how we define the route, but it wont work just yet. It wont work because
+Express doesn't have a way to parse the body (i.e. `req.body`). For that we need
+[`body-parser`](https://github.com/expressjs/body-parser).
+
+For context, when we send data to an API in a `POST` request, that data is the
+`body` of the request. That body will always be a string (or stringified JSON).
+And by default, Express wont do anything with it - we have to tell Express we
+want to use it. That's exactly what `body-parser` does (it parses the body, so
+we can use it in our request handlers).
+
+Install the `body-parser` library with NPM and import it into your `index.js`
+file. From here, we need to add it to Express.
+
+`body-parser` is an example of
+[middleware](https://expressjs.com/en/guide/using-middleware.html): a function
+that has access to the request and response object and performs some action as
+part of the request-response cycle.
+
+When we pass a function into `app.get` or `app.post`, that function is
+middleware.
+
+`body-parser` is an example of [third-party middleware](https://expressjs.com/en/guide/using-middleware.html#middleware.third-party). We can tell Express to use it with `app.use`:
+
+```js
+app.use(parser.json())
+```
+
+### Aside: Postman and Testing our Endpoint
+
+We can test out `GET` requests through the browser, but we can't do that for
+`POST` requests (yet!). To test out our `POST` requests, we need a separate
+tool: [Postman](https://www.getpostman.com/)
+
+![](./assets/postman.png)
 
 ## [License](LICENSE)
 
