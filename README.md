@@ -185,32 +185,21 @@ app.post('/list', (req, res) => {
 
 That's how we define the route, but it wont work just yet. It wont work because
 Express doesn't have a way to parse the body (i.e. `req.body`). For that we need
-[`body-parser`](https://github.com/expressjs/body-parser).
-
-For context, when we send data to an API in a `POST` request, that data is the
-`body` of the request. That body will always be a string (or stringified JSON).
-And by default, Express wont do anything with it - we have to tell Express we
-want to use it. That's exactly what `body-parser` does (it parses the body, so
-we can use it in our request handlers).
-
-Install the `body-parser` library with NPM and import it into your `index.js`
-file. From here, we need to add it to Express.
-
-`body-parser` is an example of
 [middleware](https://expressjs.com/en/guide/using-middleware.html): a function
 that has access to the request and response object and performs some action as
 part of the request-response cycle.
 
-When we pass a function into `app.get` or `app.post`, that function is
-middleware.
-
-`body-parser` is an example of [third-party
-middleware](https://expressjs.com/en/guide/using-middleware.html#middleware.third-party).
-We can tell Express to use it with `app.use`:
+For context, when we send data to an API in a `POST` request, that data is the
+`body` of the request. That body will always be a string (or stringified JSON).
+And by default, Express wont do anything with it - we have to tell Express we
+want to use it:
 
 ```js
-app.use(parser.json())
+app.use(express.json())
 ```
+
+When we pass a function into `app.get` or `app.post`, that function is
+middleware.
 
 ### Aside: Postman and Testing our Endpoint
 
