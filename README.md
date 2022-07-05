@@ -45,7 +45,7 @@ a `package.json` in this repository.
 ## Resourceful Routing
 
 We've seen this table of the [Golden
-Seven](https://restfulrouting.com/#golden-seven) named routes in REST:
+Seven](https://medium.com/@shubhangirajagrawal/the-7-restful-routes-a8e84201f206) named routes in REST:
 
 | URL | Path | Method  | Action | Description |
 | --- | --- | --- | --- | --- |
