@@ -205,7 +205,7 @@ middleware.
 
 We can test out `GET` requests through the browser, but we can't do that for
 `POST` requests (yet!). To test out our `POST` requests, we need a separate
-tool: [Postman](https://www.getpostman.com/)
+tool: [Postman](https://www.getpostman.com/) (or [vscode Rest-Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)
 
 ![](./assets/postman.png)
 
